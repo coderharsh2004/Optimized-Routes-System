@@ -1,0 +1,96 @@
+/* Main container for the form */
+.dijkstra-form-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+/* Title for the form */
+.dijkstra-form-title {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+/* General form styles */
+.dijkstra-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Label styling */
+.dijkstra-form-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #34495e;
+  margin-bottom: 8px;
+}
+
+/* Textarea for the graph input */
+.dijkstra-form-textarea {
+  width: 95%;
+  height: 150px;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Courier New', Courier, monospace;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+/* Textarea focus effect
+.dijkstra-form-textarea:focus {
+  border-color: #2980b9;
+  outline: none;
+} */
+
+/* Input field for source node */
+.dijkstra-form-input {
+  width: 95%;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+/* Input focus effect */
+.dijkstra-form-input:focus {
+  border-color: #2980b9;
+  outline: none;
+}
+
+/* Button styling */
+.dijkstra-form-button {
+  padding: 14px 24px;
+  background-color: #2980b9;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+}
+
+/* Button hover and focus effects */
+.dijkstra-form-button:hover,
+.dijkstra-form-button:focus {
+  background-color: #3498db;
+  transform: translateY(-2px);
+}
+
+/* Button active state */
+.dijkstra-form-button:active {
+  background-color: #2980b9;
+  transform: translateY(2px);
+}
+
