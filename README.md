@@ -12,9 +12,6 @@ An interactive system that calculates the shortest routes between points using D
 - [Backend](#backend)
 - [Frontend](#frontend)
 - [How to Run Locally](#how-to-run-locally)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 
