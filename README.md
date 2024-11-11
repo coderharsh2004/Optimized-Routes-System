@@ -86,3 +86,11 @@ The frontend is built with **React** for a seamless, user-friendly experience. I
 </ul>
 
 ---
+## How to Run Locally
+
+1. <strong>Clone the Repository</strong>
+
+```bash
+git clone https://github.com/yourusername/optimized-routes-system.git
+cd optimized-routes-system
+
