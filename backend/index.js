@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const { exec } = require('child_process');
@@ -14,50 +13,52 @@ app.use(express.json());
 // Route to run the Dijkstra C++ code
 app.post('/run-dijkstra', (req, res) => {
   const { graph, sourceIndex, destinationIndex, cityNames } = req.body;
-  console.log(graph, sourceIndex, destinationIndex, cityNames);
+  console.log('Received data:', graph, sourceIndex, destinationIndex, cityNames);
 
   // Convert the graph to a string representation that can be passed to the C++ program
   const graphString = graph.map(row => row.join(' ')).join('\n');
   
   // Create the input string in the expected format for the C++ program
-  const input = `${graphString}\n${sourceIndex} ${destinationIndex}`;
-  console.log('Input to C++ program:\n', input)
+  const input = `${graph.length}\n${graphString}\n${sourceIndex} ${destinationIndex}`;
+  console.log('Input to C++ program:\n', input);
+
   // Resolve the absolute path to the executable
-  const dijkstraPath = path.resolve(__dirname, 'dij.exe'); // Ensure the C++ program is in the same directory
+  const dijkstraPath = path.resolve(__dirname, 'dij.exe');
   console.log('Executable path:', dijkstraPath);
-  // Run the compiled C++ program using the resolved path and pass the input via stdin
-  exec(dijkstraPath, { input: input }, (error, stdout, stderr) => {
+
+  // Execute the C++ program, passing input through stdin
+  const child = exec(dijkstraPath, (error, stdout, stderr) => {
     if (error) {
-      console.error(`exec error: ${error}`);
-      res.status(500).send('Error running C++ program');
-      return;
+      console.error('Execution error:', error.message);
+      return res.status(500).json({ error: 'Error running C++ program' });
     }
 
     if (stderr) {
-      console.error(`stderr: ${stderr}`);
-      res.status(500).send('Error running C++ program');
-      return;
+      console.error('stderr:', stderr);
+      return res.status(500).json({ error: stderr });
     }
 
-    // Log stdout to debug the C++ program's output
-    console.log(`stdout: ${stdout}`);
-
-    // Assuming the C++ program outputs the distance as a single value
+    // Log stdout for debugging and handle the output from the C++ program
+    console.log('stdout:', stdout);
     const distance = stdout.trim();
 
-    // Get the distance to the destination city
+    // Determine if the destination is reachable
     const destinationDistance = distance === 'INF' ? 'Unreachable' : distance;
 
-    // Get the result to send back to the frontend
+    // Prepare the result to send back to the frontend
     const result = {
       sourceCity: cityNames[sourceIndex],
       destinationCity: cityNames[destinationIndex],
       destinationDistance
     };
 
-    // Send the result to the frontend
+    // Send the result back to the frontend
     res.json(result);
   });
+
+  // Provide input to the child process via stdin
+  child.stdin.write(input);
+  child.stdin.end();
 });
 
 app.listen(port, () => {

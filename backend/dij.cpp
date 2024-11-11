@@ -11,40 +11,35 @@ struct Node {
     int dist;  // The distance from the source
     int vertex;  // The node index
 
-    // Comparison operator to prioritize nodes with smaller distances
     bool operator>(const Node& other) const {
         return dist > other.dist;
     }
 };
 
-// Dijkstra's algorithm using a priority queue
+// Dijkstra's algorithm function
 void dijkstra(const vector<vector<int>>& graph, int source, vector<int>& dist, vector<int>& parent) {
     int n = graph.size();
     dist.assign(n, INT_MAX);
     parent.assign(n, -1);
     dist[source] = 0;
 
-    // Priority queue to store {distance, node} pairs. It automatically sorts by distance.
     priority_queue<Node, vector<Node>, greater<Node>> pq;
     pq.push({0, source});  // Start with the source node
 
     while (!pq.empty()) {
-        // Get the node with the smallest distance
         int u = pq.top().vertex;
         int currentDist = pq.top().dist;
         pq.pop();
 
-        // If the distance is outdated, skip processing this node
         if (currentDist > dist[u]) {
             continue;
         }
 
-        // Update the distances to neighboring nodes
         for (int v = 0; v < n; ++v) {
             if (graph[u][v] != -1 && dist[u] != INT_MAX && dist[u] + graph[u][v] < dist[v]) {
                 dist[v] = dist[u] + graph[u][v];
                 parent[v] = u;
-                pq.push({dist[v], v});  // Push the updated distance and node into the priority queue
+                pq.push({dist[v], v});
             }
         }
     }
@@ -53,42 +48,43 @@ void dijkstra(const vector<vector<int>>& graph, int source, vector<int>& dist, v
 int main() {
     int n, source, destination;
 
-    // Read the number of nodes (vertices)
-    cin >> n;
+    // Read the number of nodes
+    if (!(cin >> n)) {
+        cerr << "Error: Invalid input for the number of nodes." << endl;
+        return 1;
+    }
 
-    // Initialize the graph (adjacency matrix)
     vector<vector<int>> graph(n, vector<int>(n, -1));
 
-    // Read the adjacency matrix (space-separated values, -1 for no edge)
+    // Read the adjacency matrix
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            cin >> graph[i][j];
+            if (!(cin >> graph[i][j])) {
+                cerr << "Error: Invalid input in adjacency matrix." << endl;
+                return 1;
+            }
             if (i == j) {
-                graph[i][j] = 0;  // Distance to itself is always 0
+                graph[i][j] = 0;
             }
         }
     }
 
-    // Read the source and destination nodes
-    cin >> source >> destination;
-
-    // Validate source and destination indices
-    if (source < 0 || source >= n || destination < 0 || destination >= n) {
-        cout << "Invalid source or destination node!" << endl;
+    // Read source and destination
+    if (!(cin >> source >> destination) || source < 0 || source >= n || destination < 0 || destination >= n) {
+        cerr << "Invalid source or destination node!" << endl;
         return 1;
     }
 
-    // Vectors to store distances and parents for path reconstruction
     vector<int> dist, parent;
 
     // Run Dijkstra's algorithm
     dijkstra(graph, source, dist, parent);
 
-    // Output the shortest distances from source
+    // Output shortest distance
     if (dist[destination] == INT_MAX) {
-        cout << "INF\n";  // Destination is unreachable
+        cout << "INF" << endl;  // Unreachable destination
     } else {
-        cout << dist[destination] << "\n";  // Output the shortest distance to the destination
+        cout << dist[destination] << endl;  // Shortest distance
     }
 
     return 0;
