@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
+import Modal from 'react-modal';
 import '../styles/DijkstraForm.css';
+import GraphDisplay from './GraphDisplay'; // Import the GraphDisplay component
 
 const DijkstraForm = ({ onSubmit }) => {
   const [graph, setGraph] = useState('');
   const [source, setSource] = useState('');
-  const [destination, setDestination] = useState(''); // New state for destination city
+  const [destination, setDestination] = useState('');
   const [cities, setCities] = useState('');
-  const [shortestPaths, setShortestPaths] = useState(null);  // State to store the results
+  const [shortestPaths, setShortestPaths] = useState(null);
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(''); // Reset error message on each submit attempt
 
-    // Parse graph input into a proper format (parse as a matrix)
     let parsedGraph;
     try {
       parsedGraph = graph
@@ -28,12 +30,9 @@ const DijkstraForm = ({ onSubmit }) => {
       return;
     }
 
-    // Parse cities
-    const cityNames = cities.split(',').map((city) => city.trim()); // Split cities and trim spaces
-
-    // Find the source index based on the city name
-    const sourceIndex = cityNames.indexOf(source.trim()); // Trim spaces for consistency
-    const destinationIndex = cityNames.indexOf(destination.trim()); // Trim spaces for destination city
+    const cityNames = cities.split(',').map((city) => city.trim());
+    const sourceIndex = cityNames.indexOf(source.trim());
+    const destinationIndex = cityNames.indexOf(destination.trim());
 
     if (sourceIndex === -1) {
       setError('Source city not found in the list of cities.');
@@ -45,14 +44,16 @@ const DijkstraForm = ({ onSubmit }) => {
       return;
     }
 
-    // Call the onSubmit with parsed data
-    onSubmit(parsedGraph, sourceIndex, destinationIndex, cityNames, setShortestPaths); // Pass destination index
+    // Call the onSubmit function, passing the graph and cities, and setShortestPaths for storing the result
+    onSubmit(parsedGraph, sourceIndex, destinationIndex, cityNames, setShortestPaths);
+    setIsModalOpen(true);
   };
 
   return (
     <div className="dijkstra-form-container">
       <h2 className="dijkstra-form-title">Enter Graph Data (Cities and Distances)</h2>
       <form onSubmit={handleSubmit} className="dijkstra-form">
+        {/* City Names Field */}
         <label className="dijkstra-form-label">
           City Names (comma-separated):
           <input
@@ -64,16 +65,20 @@ const DijkstraForm = ({ onSubmit }) => {
           />
         </label>
         <br />
+        
+        {/* Graph Matrix Field */}
         <label className="dijkstra-form-label">
-          Graph (distances as a comma-separated matrix, e.g. 0,1,4,0):
+          Graph (distances as a comma-separated matrix):
           <textarea
             value={graph}
             onChange={(e) => setGraph(e.target.value)}
-            placeholder="Enter distances as rows of comma-separated numbers"
+            placeholder="Enter distances as rows of comma-separated numbers (e.g., 0,10,15,-1)"
             className="dijkstra-form-textarea"
           />
         </label>
         <br />
+
+        {/* Source City Field */}
         <label className="dijkstra-form-label">
           Source City:
           <input
@@ -85,6 +90,8 @@ const DijkstraForm = ({ onSubmit }) => {
           />
         </label>
         <br />
+
+        {/* Destination City Field */}
         <label className="dijkstra-form-label">
           Destination City:
           <input
@@ -96,28 +103,45 @@ const DijkstraForm = ({ onSubmit }) => {
           />
         </label>
         <br />
+
         <button type="submit" className="dijkstra-form-button">
           Run Dijkstra
         </button>
-
+        
         {/* Display any error messages */}
         {error && <p className="error-message">{error}</p>}
       </form>
 
-      {/* Display shortest path results */}
-      {shortestPaths && (
-        <div className="dijkstra-results">
-          <h3>Shortest Path from {source} to {destination}</h3>
-          <p>
-            {shortestPaths[destination] === Infinity
-              ? 'Destination is Unreachable'
-              : `Shortest Distance: ${shortestPaths[destination]}`}
-          </p>
-        </div>
-      )}
+      {/* Modal for showing results */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Dijkstra Result"
+        ariaHideApp={false}
+        className="dijkstra-modal"
+      >
+        <h3>Shortest Path from {source} to {destination}</h3>
+        <p>
+          {shortestPaths && shortestPaths.destinationDistance === 'Unreachable'
+            ? 'Destination is Unreachable'
+            : `Shortest Distance: ${shortestPaths ? shortestPaths.destinationDistance : 'Not calculated yet'}`}
+        </p>
+
+        {/* Render the path, if available */}
+        {shortestPaths && shortestPaths.path && (
+          <div>
+            <h4>Shortest Path:</h4>
+            <p>{shortestPaths.path.join(' → ')}</p> {/* Display the path as a series of cities */}
+          </div>
+        )}
+
+        {/* Render the graph using the GraphDisplay component */}
+        <GraphDisplay graph={graph.split('\n').map(row => row.split(',').map(Number))} cityNames={cities.split(',')} />
+
+        <button onClick={() => setIsModalOpen(false)}>Close</button>
+      </Modal>
     </div>
   );
 };
 
 export default DijkstraForm;
-
